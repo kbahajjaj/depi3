@@ -24,7 +24,6 @@ class EmployeeManager:
             # check csv for header
             f.seek(0)
             csv_header = f.readline().strip().split(",")
-            #print(csv_header)
 
             # Write header (if it doesn't exist) and data into csv file    
             writer = csv.DictWriter(f, fieldnames=header)
@@ -37,14 +36,13 @@ class EmployeeManager:
             employee_ids = []
             reader = csv.reader(f)
             for row in reader:
-                employee_ids.append(int(row[0]))
-                #print(employee_ids)
+                employee_ids.append(row[0])
             
             if employee['ID'] in employee_ids:
-                print(f"Employee ID: [{employee['ID']}] aready exists\nNot added to database")
+                print(f"Employee ID: [{employee['ID']}] aready exists\nCouldn't add to DataBase")
             else:
                 writer.writerow(employee)
-                print(f"Employee ID: [{employee['ID']}] data is added to database")
+                print(f"Employee: {employee['Name']} - ID: [{employee['ID']}] data is added to DataBase")
 
         # Clear memory:
         del employee
