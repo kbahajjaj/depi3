@@ -1,0 +1,1 @@
+{"field_1": {"Name": "Username", "Input Type": "text", "Default Value": ""}, "field_2": {"Name": "Password", "Input Type": "password", "Default Value": ""}, "field_3": {"Name": "Choose an option", "Input Type": "checkbox", "Default Value": "option1"}}
