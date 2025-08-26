@@ -1,0 +1,115 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submit-task",
+        "responseMode": "onReceived"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Google Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "parameters": {
+        "operation": "download",
+        "documentId": "={{$json[\"docId\"]}}"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch GitHub Notebook",
+      "type": "n8n-nodes-base.github",
+      "parameters": {
+        "operation": "getFile",
+        "repository": "={{$json[\"repo\"]}}",
+        "filePath": "={{$json[\"notebookPath\"]}}"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Parse Requirements",
+      "type": "n8n-nodes-base.openAi",
+      "parameters": {
+        "operation": "chat",
+        "model": "gpt-4",
+        "prompt": "Extract the required Python tasks and expected outputs from this document and return as JSON."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Run Notebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://<your-jupyter-runner-service>/execute",
+        "method": "POST",
+        "body": {
+          "notebook": "={{$json[\"notebookFile\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Evaluate Outputs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "// Compare notebook outputs with expected JSON\nreturn items;"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Debug Notebook",
+      "type": "n8n-nodes-base.openAi",
+      "parameters": {
+        "operation": "chat",
+        "model": "gpt-4",
+        "prompt": "Analyze the notebook code and logs. Find issues and suggest fixes."
+      }
+    },
+    {
+      "id": "8",
+      "name": "Generate Fixed Code",
+      "type": "n8n-nodes-base.openAi",
+      "parameters": {
+        "operation": "chat",
+        "model": "gpt-4",
+        "prompt": "Provide corrected Python code based on the issues found."
+      }
+    },
+    {
+      "id": "9",
+      "name": "Create Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://<pdf-service>/generate",
+        "method": "POST",
+        "body": {
+          "content": "={{$json[\"analysis\"]}}"
+        }
+      }
+    },
+    {
+      "id": "10",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "responseMode": "onReceived",
+        "responseData": "={{$json}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {"main": [[{"node": "Get Google Doc", "type": "main"}]]},
+    "Get Google Doc": {"main": [[{"node": "Fetch GitHub Notebook", "type": "main"}]]},
+    "Fetch GitHub Notebook": {"main": [[{"node": "Parse Requirements", "type": "main"}]]},
+    "Parse Requirements": {"main": [[{"node": "Run Notebook", "type": "main"}]]},
+    "Run Notebook": {"main": [[{"node": "Evaluate Outputs", "type": "main"}]]},
+    "Evaluate Outputs": {"main": [[{"node": "Send Response", "type": "main"}, {"node": "Debug Notebook", "type": "main"}]]},
+    "Debug Notebook": {"main": [[{"node": "Generate Fixed Code", "type": "main"}]]},
+    "Generate Fixed Code": {"main": [[{"node": "Create Report", "type": "main"}]]},
+    "Create Report": {"main": [[{"node": "Send Response", "type": "main"}]]}
+  }
+}
