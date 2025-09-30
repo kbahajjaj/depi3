@@ -1,0 +1,23 @@
+ 1. Define and study problem
+Acquire domain Knowledge 
+Banking -> take courses
+
+2. Data Gathering:
+	1. Database
+	2. Kaggle || RoboFlow || HuggingFace
+	3. Web Scraping
+	4. API
+	5. Manual Collection
+3. Data Representation
+4. Data Wrangling:
+	1. Drop Unneeded Columns (Feature Selection)
+	2. Handle Missing Values
+	3. Drop Duplicated Values
+	4. Transformation
+5. Data Analysis
+	1. Univariate Analysis
+	2. Bivariate Analysis
+	3. Multivariate Analysis
+6. Data Preprocessing
+7. Data Modeling
+8. Deployment
